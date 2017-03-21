@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class BLEStreamActivity extends Activity {
+public class  BLEStreamActivity extends Activity {
 
     private final static String TAG = "__*__BLEStreamActivity";
 
@@ -140,6 +140,8 @@ public class BLEStreamActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
 
+        Log.i(TAG, "BLEStream activated");
+
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
@@ -151,8 +153,9 @@ public class BLEStreamActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
-        getActionBar().setTitle(mDeviceName);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //TODO: Fix ActionBar
+//        getActionBar().setTitle(mDeviceName);
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BLEService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }

@@ -175,16 +175,19 @@ public class BLEScanActivity extends ListActivity{
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+
+        Log.i(TAG, "List Click Detected");
+
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
-//        final Intent intent = new Intent(this, DeviceControlActivity.class);
-//        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-//        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        final Intent intent = new Intent(this, BLEStreamActivity.class);
+        intent.putExtra(BLEStreamActivity.EXTRAS_DEVICE_NAME, device.getName());
+        intent.putExtra(BLEStreamActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;
         }
-//        startActivity(intent);
+        startActivity(intent);
     }
 
     private void scanLeDevice(final boolean enable) {
