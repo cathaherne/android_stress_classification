@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,9 +31,9 @@ import com.aherne.cath.stress_detect.R;
 
 import java.util.ArrayList;
 
-public class BLEScanActivity extends ListActivity {
+public class BLEScanActivity extends ListActivity{
 
-    static String TAG = "___***___BLEScanActivity";
+    static String TAG = "_*_BLEScanActivity";
 
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
@@ -49,7 +50,7 @@ public class BLEScanActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_blescan);
 
-//        getActionBar().setTitle(R.string.title_devices);
+//        getActionBar().setTitle("BLE Device Scan");
         mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -61,12 +62,17 @@ public class BLEScanActivity extends ListActivity {
 
         ////////////////////////////////////////////////////////////
 
+        //Checks permissions - needed for newer Android versions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            // Android M Permission check 
-            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            Log.i(TAG, "PM: " + PackageManager.PERMISSION_GRANTED);
+            Log.i(TAG, "MP: " + this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION));
+
+            //TODO: Implement programmatically turning on location & investigate this check
+//            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                Log.i(TAG, "SHOULD HAVE LOCATION");
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("This app needs location access");
-                builder.setMessage("Please grant location access so this app can detect ble devices.");
+                builder.setMessage("Please grant location access so this app can detect ble devices. ALSO TURN ON LOCATION PLZ.");
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener(){
                     @TargetApi(23)
@@ -75,13 +81,13 @@ public class BLEScanActivity extends ListActivity {
                     }
                 });
                 builder.show();
-            }
+//            }
         }
 
+        Log.i(TAG, "Permissions checked!");
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
+        // Initializes a Bluetooth adapter
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -94,11 +100,15 @@ public class BLEScanActivity extends ListActivity {
         }
 
 
+        Log.i(TAG, "" + isLocationEnabled());
+
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        Log.i(TAG, "Menu created!");
         getMenuInflater().inflate(R.menu.main, menu);
         if (!mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(false);
@@ -179,6 +189,11 @@ public class BLEScanActivity extends ListActivity {
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
+
+            //TODO Change to startScan using bluetoothlescanner
+
+            Log.i(TAG, "Scanning for devices");
+
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -286,10 +301,22 @@ public class BLEScanActivity extends ListActivity {
                 }
             };
 
+    public boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            return true;
+
+        }
+        else return false;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[],
                                            int[] grantResults) {
+
+        Log.i(TAG, "GOT PERMISSION RESULT");
+
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {

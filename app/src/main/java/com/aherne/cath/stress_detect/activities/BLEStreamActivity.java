@@ -20,11 +20,12 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 import com.aherne.cath.stress_detect.R;
-import com.aherne.cath.stress_detect.services.BluetoothLeService;
+import com.aherne.cath.stress_detect.services.BLEService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 
 public class BLEStreamActivity extends Activity {
 
@@ -38,7 +39,7 @@ public class BLEStreamActivity extends Activity {
     private String mDeviceName;
     private String mDeviceAddress;
     private ExpandableListView mGattServicesList;
-    private BluetoothLeService mBluetoothLeService;
+    private BLEService mBLEService;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private boolean mConnected = false;
@@ -52,18 +53,18 @@ public class BLEStreamActivity extends Activity {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            mBLEService = ((BLEService.LocalBinder) service).getService();
+            if (!mBLEService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBLEService.connect(mDeviceAddress);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLeService = null;
+            mBLEService = null;
         }
     };
 
@@ -77,20 +78,20 @@ public class BLEStreamActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+            if (BLEService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 updateConnectionState(R.string.connected);
                 invalidateOptionsMenu();
-            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+            } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 updateConnectionState(R.string.disconnected);
                 invalidateOptionsMenu();
                 clearUI();
-            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+            } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                displayGattServices(mBLEService.getSupportedGattServices());
+            } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
+                displayData(intent.getStringExtra(BLEService.EXTRA_DATA));
             }
         }
     };
@@ -112,15 +113,15 @@ public class BLEStreamActivity extends Activity {
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
                             if (mNotifyCharacteristic != null) {
-                                mBluetoothLeService.setCharacteristicNotification(
+                                mBLEService.setCharacteristicNotification(
                                         mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
-                            mBluetoothLeService.readCharacteristic(characteristic);
+                            mBLEService.readCharacteristic(characteristic);
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
-                            mBluetoothLeService.setCharacteristicNotification(
+                            mBLEService.setCharacteristicNotification(
                                     characteristic, true);
                         }
                         return true;
@@ -152,7 +153,7 @@ public class BLEStreamActivity extends Activity {
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        Intent gattServiceIntent = new Intent(this, BLEService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
@@ -160,8 +161,8 @@ public class BLEStreamActivity extends Activity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+        if (mBLEService != null) {
+            final boolean result = mBLEService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
         }
     }
@@ -176,7 +177,7 @@ public class BLEStreamActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(mServiceConnection);
-        mBluetoothLeService = null;
+        mBLEService = null;
     }
 
     @Override
@@ -196,10 +197,10 @@ public class BLEStreamActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_connect:
-                mBluetoothLeService.connect(mDeviceAddress);
+                mBLEService.connect(mDeviceAddress);
                 return true;
             case R.id.menu_disconnect:
-                mBluetoothLeService.disconnect();
+                mBLEService.disconnect();
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -282,10 +283,10 @@ public class BLEStreamActivity extends Activity {
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BLEService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BLEService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BLEService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
 }

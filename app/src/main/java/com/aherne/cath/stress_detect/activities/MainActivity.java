@@ -15,6 +15,9 @@ public class MainActivity extends AppCompatActivity {
 
     //Init Buttons
     private Button blescanButton;
+    private Button collectButton;
+    private Button trainButton;
+    private Button classifyButton;
 
 
     @Override
@@ -26,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Buttons
         blescanButton = (Button) findViewById(R.id.bleButton);
+        collectButton = (Button) findViewById(R.id.cltButton);
+        trainButton = (Button) findViewById(R.id.trnButton);
+        classifyButton = (Button) findViewById(R.id.clsButton);
+
 
 
         //OnClickListeners
@@ -34,9 +41,47 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
+                Log.i(TAG, "BLE button clicked");
                 Intent myIntent = new Intent(MainActivity.this, BLEScanActivity.class);
                 MainActivity.this.startActivity(myIntent);
             }
         });
+
+        //OnClickListeners
+        collectButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.i(TAG, "Collect button clicked");
+//                Intent myIntent = new Intent(MainActivity.this, newActivity.class);
+//                MainActivity.this.startActivity(myIntent);
+            }
+        });
+
+        //OnClickListeners
+        trainButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.i(TAG, "Train button clicked");
+//                Intent myIntent = new Intent(MainActivity.this, newActivity.class);
+//                MainActivity.this.startActivity(myIntent);
+            }
+        });
+
+        //OnClickListeners
+        classifyButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.i(TAG, "Classify button clicked");
+//                Intent myIntent = new Intent(MainActivity.this, newActivity.class);
+//                MainActivity.this.startActivity(myIntent);
+            }
+        });
+
     }
 }
