@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Service for managing connection and data communication with a GATT server hosted on a
- * given Bluetooth LE device.
+ * Service for connecting and communicating with a GATT server on a BLE device.
  */
 public class BLEService extends Service {
     private final static String TAG = BLEService.class.getSimpleName();
@@ -63,7 +62,7 @@ public class BLEService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
 
-    public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("STANDINSTRING");
+    public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 //            UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
     // Implements callback methods for GATT events that the app cares about.  For example,
@@ -214,6 +213,8 @@ public class BLEService extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
+
+        Log.i(TAG, "REACHED BLEService");
 
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)

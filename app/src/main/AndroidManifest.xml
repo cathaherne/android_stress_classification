@@ -12,7 +12,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@android:style/Theme.Holo.Light">
 
 
         <activity android:name=".activities.MainActivity">
@@ -24,6 +24,9 @@
         </activity>
         <activity android:name=".activities.BLEScanActivity" />
         <activity android:name=".activities.BLEStreamActivity"></activity>
+
+
+        <service android:name=".services.BLEService" android:enabled="true"/>
 
 
 

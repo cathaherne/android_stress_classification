@@ -53,7 +53,9 @@ public class  BLEStreamActivity extends Activity {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
+            Log.i(TAG, "Reached OnServiceConnected");
             mBLEService = ((BLEService.LocalBinder) service).getService();
+            if (mBLEService == null) Log.i(TAG, "mBLEService IS NULL 1");
             if (!mBLEService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
@@ -64,6 +66,7 @@ public class  BLEStreamActivity extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            Log.i(TAG, "mBLEService made null");
             mBLEService = null;
         }
     };
@@ -146,6 +149,8 @@ public class  BLEStreamActivity extends Activity {
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
 
+        Log.i(TAG, "Got: " + mDeviceName + mDeviceAddress);
+
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
@@ -153,11 +158,15 @@ public class  BLEStreamActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
-        //TODO: Fix ActionBar
-//        getActionBar().setTitle(mDeviceName);
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //TODO: Check Service is binding and gets called
+        Log.i(TAG, "Service 1");
+        getActionBar().setTitle(mDeviceName);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        Log.i(TAG, "Service 2");
         Intent gattServiceIntent = new Intent(this, BLEService.class);
+        Log.i(TAG, "Service 3");
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        Log.i(TAG, "Service 4");
     }
 
     @Override
@@ -165,6 +174,7 @@ public class  BLEStreamActivity extends Activity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBLEService != null) {
+            Log.i(TAG, "Service NOT null");
             final boolean result = mBLEService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
         }
@@ -200,6 +210,8 @@ public class  BLEStreamActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_connect:
+                Log.i(TAG, "Is string null? : " + mDeviceAddress);
+                if (mBLEService == null) Log.i(TAG, "mBLEService IS NULLLLLLL ");
                 mBLEService.connect(mDeviceAddress);
                 return true;
             case R.id.menu_disconnect:

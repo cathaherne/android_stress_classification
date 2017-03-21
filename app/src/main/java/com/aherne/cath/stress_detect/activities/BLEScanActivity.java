@@ -48,9 +48,8 @@ public class BLEScanActivity extends ListActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_blescan);
 
-//        getActionBar().setTitle("BLE Device Scan");
+        getActionBar().setTitle("BLE Device Scan");
         mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -108,7 +107,7 @@ public class BLEScanActivity extends ListActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        Log.i(TAG, "Menu created!");
+        Log.i(TAG, "Menu created 2!");
         getMenuInflater().inflate(R.menu.main, menu);
         if (!mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(false);
@@ -181,6 +180,7 @@ public class BLEScanActivity extends ListActivity{
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
         final Intent intent = new Intent(this, BLEStreamActivity.class);
+        Log.i(TAG, "Put: " + device.getName() + device.getAddress());
         intent.putExtra(BLEStreamActivity.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(BLEStreamActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
         if (mScanning) {

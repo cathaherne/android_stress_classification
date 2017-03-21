@@ -1,15 +1,16 @@
 package com.aherne.cath.stress_detect.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
 import com.aherne.cath.stress_detect.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     static String TAG = "___***___MainActivity";
 
@@ -18,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private Button collectButton;
     private Button trainButton;
     private Button classifyButton;
+
+
 
 
     @Override
@@ -84,4 +87,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        Log.i(TAG, "Menu Creation");
+
+        menu.findItem(R.id.menu_stop).setVisible(false);
+        menu.findItem(R.id.menu_scan).setVisible(false);
+        menu.findItem(R.id.menu_refresh).setVisible(false);
+
+        return true;
+    }
+
+
 }
