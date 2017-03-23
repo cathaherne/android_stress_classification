@@ -92,6 +92,7 @@ public class  BLEStreamActivity extends Activity {
                 clearUI();
             } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
+                //todo this line
                 displayGattServices(mBLEService.getSupportedGattServices());
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BLEService.EXTRA_DATA));
@@ -108,19 +109,22 @@ public class  BLEStreamActivity extends Activity {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                             int childPosition, long id) {
+                    Log.i(TAG, "servicesListClick!!!"); //when clicking on mini putting strings
+
                     if (mGattCharacteristics != null) {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
                         final int charaProp = characteristic.getProperties();
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            // If there is an active notification on a characteristic, clear
-                            // it first so it doesn't update the data field on the user interface.
+//                             If there is an active notification on a characteristic, clear
+//                             it first so it doesn't update the data field on the user interface.
                             if (mNotifyCharacteristic != null) {
                                 mBLEService.setCharacteristicNotification(
                                         mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
                             mBLEService.readCharacteristic(characteristic);
+                            Log.i(TAG, "READ characteristic called");
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
@@ -158,15 +162,13 @@ public class  BLEStreamActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
-        //TODO: Check Service is binding and gets called
-        Log.i(TAG, "Service 1");
+
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        Log.i(TAG, "Service 2");
+
+        //Service is bound
         Intent gattServiceIntent = new Intent(this, BLEService.class);
-        Log.i(TAG, "Service 3");
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-        Log.i(TAG, "Service 4");
     }
 
     @Override
@@ -174,7 +176,7 @@ public class  BLEStreamActivity extends Activity {
         super.onResume();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBLEService != null) {
-            Log.i(TAG, "Service NOT null");
+            Log.i(TAG, "Resuming BLEStreamActivity");
             final boolean result = mBLEService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
         }
@@ -210,8 +212,7 @@ public class  BLEStreamActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_connect:
-                Log.i(TAG, "Is string null? : " + mDeviceAddress);
-                if (mBLEService == null) Log.i(TAG, "mBLEService IS NULLLLLLL ");
+                Log.i(TAG, "Connecting!");
                 mBLEService.connect(mDeviceAddress);
                 return true;
             case R.id.menu_disconnect:
@@ -244,37 +245,39 @@ public class  BLEStreamActivity extends Activity {
     // on the UI.
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
+
         String uuid = null;
-        String unknownServiceString = getResources().getString(R.string.unknown_service);
-        String unknownCharaString = getResources().getString(R.string.unknown_characteristic);
+//        String unknownServiceString = getResources().getString(R.string.unknown_service);
+//        String unknownCharaString = getResources().getString(R.string.unknown_characteristic);
         ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
-        ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData
-                = new ArrayList<ArrayList<HashMap<String, String>>>();
+        ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData = new ArrayList<ArrayList<HashMap<String, String>>>();
         mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+
 
         // Loops through available GATT Services.
         for (BluetoothGattService gattService : gattServices) {
+
             HashMap<String, String> currentServiceData = new HashMap<String, String>();
+
             uuid = gattService.getUuid().toString();
-//            currentServiceData.put(
-//                    LIST_NAME, SampleGattAttributes.lookup(uuid, unknownServiceString));
+            Log.i(TAG, "service uuid: " + uuid);
+
+            currentServiceData.put(LIST_NAME, "Service");
             currentServiceData.put(LIST_UUID, uuid);
             gattServiceData.add(currentServiceData);
 
-            ArrayList<HashMap<String, String>> gattCharacteristicGroupData =
-                    new ArrayList<HashMap<String, String>>();
-            List<BluetoothGattCharacteristic> gattCharacteristics =
-                    gattService.getCharacteristics();
-            ArrayList<BluetoothGattCharacteristic> charas =
-                    new ArrayList<BluetoothGattCharacteristic>();
+            ArrayList<HashMap<String, String>> gattCharacteristicGroupData = new ArrayList<HashMap<String, String>>();
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+            ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
 
             // Loops through available Characteristics.
             for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                 charas.add(gattCharacteristic);
+//                Log.i(TAG, "characteristic: " + mBLEService.readCharacteristic(gattCharacteristic));
                 HashMap<String, String> currentCharaData = new HashMap<String, String>();
                 uuid = gattCharacteristic.getUuid().toString();
-//                currentCharaData.put(
-//                        LIST_NAME, SampleGattAttributes.lookup(uuid, unknownCharaString));
+                Log.i(TAG, "characteristic uuid: " + uuid);
+                currentCharaData.put(LIST_NAME, "Characteristic");
                 currentCharaData.put(LIST_UUID, uuid);
                 gattCharacteristicGroupData.add(currentCharaData);
             }
@@ -295,6 +298,7 @@ public class  BLEStreamActivity extends Activity {
         );
         mGattServicesList.setAdapter(gattServiceAdapter);
     }
+
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();

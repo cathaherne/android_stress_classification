@@ -52,8 +52,7 @@ public class BLEScanActivity extends ListActivity{
         getActionBar().setTitle("BLE Device Scan");
         mHandler = new Handler();
 
-        // Use this check to determine whether BLE is supported on the device.  Then you can
-        // selectively disable BLE-related features.
+        // Check BLE supported
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
@@ -63,12 +62,9 @@ public class BLEScanActivity extends ListActivity{
 
         //Checks permissions - needed for newer Android versions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            Log.i(TAG, "PM: " + PackageManager.PERMISSION_GRANTED);
-            Log.i(TAG, "MP: " + this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION));
 
             //TODO: Implement programmatically turning on location & investigate this check
 //            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                Log.i(TAG, "SHOULD HAVE LOCATION");
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("This app needs location access");
                 builder.setMessage("Please grant location access so this app can detect ble devices. ALSO TURN ON LOCATION PLZ.");
@@ -83,7 +79,6 @@ public class BLEScanActivity extends ListActivity{
 //            }
         }
 
-        Log.i(TAG, "Permissions checked!");
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Initializes a Bluetooth adapter
@@ -99,7 +94,8 @@ public class BLEScanActivity extends ListActivity{
         }
 
 
-        Log.i(TAG, "" + isLocationEnabled());
+        Log.i(TAG, "Location: " + isLocationEnabled());
+        Log.i(TAG, "BLEScanAvtivity onCreated");
 
     }
 
@@ -107,7 +103,7 @@ public class BLEScanActivity extends ListActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        Log.i(TAG, "Menu created 2!");
+        Log.i(TAG, "Menu created");
         getMenuInflater().inflate(R.menu.main, menu);
         if (!mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(false);
@@ -124,6 +120,9 @@ public class BLEScanActivity extends ListActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        Log.i(TAG, "Menu item selected");
+
         switch (item.getItemId()) {
             case R.id.menu_scan:
                 mLeDeviceListAdapter.clear();
@@ -140,8 +139,9 @@ public class BLEScanActivity extends ListActivity{
     protected void onResume() {
         super.onResume();
 
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
+        Log.i(TAG, "onResume");
+
+        // Ensures Bluetooth is enabled
         if (!mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -318,7 +318,7 @@ public class BLEScanActivity extends ListActivity{
                                            String permissions[],
                                            int[] grantResults) {
 
-        Log.i(TAG, "GOT PERMISSION RESULT");
+        Log.i(TAG, "Got permission result");
 
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
