@@ -22,6 +22,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -32,6 +33,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service for connecting and communicating with a GATT server on a BLE device.
@@ -288,16 +290,15 @@ public class BLEService extends Service {
 //        if(characteristic != null) Log.i(TAG, "New characteristic: " + new String(characteristic.getValue()));
 
 //        // This is specific to Heart Rate Measurement.
-//        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
+        if ("0000ffe1-0000-1000-8000-00805f9b34fb".equals(characteristic.getUuid())) {
 
-//        mBluetoothGatt.readDescriptor(ccc);
-//            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-//                    UUID.fromString("MOARSTANDIN"/*SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG*/));
-//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//            mBluetoothGatt.writeDescriptor(descriptor);
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(//characteristic.getUuid());
+                    UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"/*SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG*/));
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
 
 
-//        } // TODO: 23/03/2017
+        }
     }
 
     /**

@@ -92,7 +92,7 @@ public class  BLEStreamActivity extends Activity {
                 clearUI();
             } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                //todo this line
+                //todo Look into saving vals not just displaying
                 displayGattServices(mBLEService.getSupportedGattServices());
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BLEService.EXTRA_DATA));
